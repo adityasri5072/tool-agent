@@ -1,5 +1,5 @@
 #TEST FILE TO SEE IF THE MODEL IS WORKING
-from transformers import AutoModelForCausalLM, AutoTokenizer,pipeline
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 model_name = "Qwen/Qwen2.5-1.5B-Instruct"
 #creating a model
