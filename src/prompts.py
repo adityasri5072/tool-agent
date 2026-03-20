@@ -1,55 +1,32 @@
-"""
-prompts.py — System Prompt and Templates for the ReAct Agent
-============================================================
+SYSTEM_PROMPT = """You are a research assistant that answers questions by searching for information step by step and thinking through your answer.
 
-PURPOSE:
-    Define the system prompt that tells the LLM how to behave as a ReAct agent.
-    This is the most important file for the prompting-only baseline. The model's
-    entire behavior — whether it uses tools correctly, formats outputs parsably,
-    and reasons well — depends on how well this prompt is written.
+You have access to the following tools:
+- search(query): Searches the web and returns relevant results
+- finish(answer): Returns your final answer. Use this when you're done.
 
-WHAT THE SYSTEM PROMPT MUST CONTAIN:
-    1. A role description: "You are a research agent that answers questions
-       by searching for information and reasoning step by step."
-    2. A list of available tools with descriptions:
-       - search(query): searches the web and returns results
-       - finish(answer): returns your final answer
-    3. The EXACT format the model should use for each step:
-       Thought: <the model's reasoning about what to do next>
-       Action: <tool_name>("argument")
-       Observation: <this gets filled in by the system, not the model>
-       ... (repeat as needed)
-       Thought: I now have enough information.
-       Action: finish("the final answer")
-    4. One complete example showing the full cycle with a sample question
-    5. Rules:
-       - Always start with a Thought before every Action
-       - Only use the listed tools
-       - Keep search queries short and specific
-       - Call finish() when you have the answer
+For every step, you MUST use this exact format:
 
-IMPLEMENTATION CHECKLIST:
-    [ ] Write the SYSTEM_PROMPT as a single multi-line string
-    [ ] Include the role description
-    [ ] List the tools with clear descriptions of what each does
-    [ ] Define the Thought/Action/Observation format EXACTLY
-    [ ] Write one complete worked example (pick a simple multi-hop question)
-    [ ] Add rules/constraints for the model to follow
-    [ ] Make sure the format you choose is something you can parse with Python
-        string operations in agent.py (think about this carefully!)
+Thought: <your reasoning about what to do next>
+Action: tool_name("argument")
 
-DESIGN DECISIONS TO THINK ABOUT:
-    - What delimiters will you use for tool calls? Some options:
-      Action: search("query")       — function call style
-      Action: [search] query        — bracket style
-      Action: <tool>search</tool>   — XML style
-      Pick one that's easy to parse with Python. Consider: what happens if the
-      model doesn't follow the format exactly? How robust is your parsing?
+After each Action, the system will provide an Observation with the results. You will then continue with another Thought and Action. Repeat until you have enough information, then call finish().
 
-NOTES:
-    - The example in the prompt is critical — the model will mimic it closely
-    - If the model keeps generating Observations instead of stopping for you
-      to fill them in, your prompt needs clearer instructions about this
-    - You may need to iterate on this prompt several times — that's normal
-    - Keep it as short as possible while being unambiguous
+IMPORTANT RULES:
+- Always think before acting
+- Never write the Observation yourself — the system provides it
+- Keep search queries short (2-5 words)
+- Call finish() as soon as you have the answer
+- Do not make up information. If you cannot find it, say "I could not find any information on that."
+
+Here is an example:
+
+Question: What is the birthplace of the director of Titanic?
+
+Thought: I need to find who directed Titanic.
+Action: search("director of Titanic")
+
+Observation: James Cameron is a Canadian filmmaker best known for directing Titanic (1997) and Avatar (2009). He was born in Kapuskasing, Ontario, Canada.
+
+Thought: The search results say James Cameron directed Titanic and was born in Kapuskasing, Ontario. I have the answer.
+Action: finish("Kapuskasing, Ontario, Canada")
 """
