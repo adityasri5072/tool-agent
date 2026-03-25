@@ -1,9 +1,17 @@
 from tools import TOOLS
 from prompts import SYSTEM_PROMPT
 from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
+
+if torch.cuda.is_available():
+    device = "cuda"
+elif torch.backends.mps.is_available():
+    device = "mps"
+else:
+    device = "cpu"
 
 #Load Model and Tokenizer
-model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-1.5B-Instruct")
+model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-1.5B-Instruct").to(device)
 tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-1.5B-Instruct")
 
 def parse_action(generated_text):
@@ -19,8 +27,8 @@ def agent_loop(question):
     messages = [{"role": "system", "content": f"{SYSTEM_PROMPT}"},
                 {"role": "user", "content": question}]
     for i in range(6):
-        tokenized_chat = tokenizer.apply_chat_template(messages, tokenize=False)
-        model_input = tokenizer([tokenized_chat],return_tensors='pt')
+        tokenized_chat = tokenizer.apply_chat_template(messages, tokenize=False,add_generation_prompt=True)
+        model_input = tokenizer(tokenized_chat, return_tensors="pt").to(device)
         generated = model.generate(model_input.input_ids, max_new_tokens=200)
         new_tokens = generated[0][model_input.input_ids.shape[1]:]
         decoded = tokenizer.decode(new_tokens, skip_special_tokens=True)

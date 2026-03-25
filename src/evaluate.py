@@ -15,4 +15,4 @@ if __name__ == "__main__":
             print(f"Expected: {truth}")
             print(f"Agent said: {answer}")
             count += 1
-    print(f"\nResults: {count}/{20} correct ({count/20*100:.1f}%)")
+    print(f"\nResults: {count}/{5} correct ({count/5 *100:.1f}%)")
