@@ -1,14 +1,23 @@
 #TEST FILE TO SEE IF THE MODEL IS WORKING
 from transformers import AutoModelForCausalLM, AutoTokenizer
+import torch
+import time
+
+if torch.cuda.is_available():
+    device = "cuda"
+elif torch.backends.mps.is_available():
+    device = "mps"
+else:
+    device = "cpu"
 
 model_name = "Qwen/Qwen2.5-1.5B-Instruct"
 #creating a model
-model = AutoModelForCausalLM.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-1.5B-Instruct").to(device)
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 messages = [{"role": "user", "content": "What is the capital of France?"}]
 tokenized_chat =tokenizer.apply_chat_template(messages, tokenize=False)
-model_input = tokenizer(tokenized_chat,return_tensors="pt")
+model_input = tokenizer(tokenized_chat, return_tensors="pt").to(device)
 generated = model.generate(model_input.input_ids, max_new_tokens=200)
 decoded = tokenizer.decode(generated[0], skip_special_tokens=True)
 print(decoded)
